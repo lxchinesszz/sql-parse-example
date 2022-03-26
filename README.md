@@ -2,9 +2,6 @@
 
 ![](https://img.springlearn.cn/blog/learn_1648308606000.png)
 
-:::info
-本篇主要学习Druid 对Sql的语法解析。学习完之后,我们可以对任意sql进行解析,同时也可以基于AST语法树来生成sql语句。
-:::
 
 [![](https://img.shields.io/badge/SQL%E8%A7%A3%E6%9E%90-sql--parse--example-green)](https://github.com/lxchinesszz/sql-parse-example)
 
