@@ -1,5 +1,12 @@
 > 本篇主要学习Druid 对Sql的语法解析。学习完之后,我们可以对任意sql进行解析,同时也可以基于AST语法树来生成sql语句。
 
+![](https://img.springlearn.cn/blog/learn_1648308606000.png)
+
+:::info
+本篇主要学习Druid 对Sql的语法解析。学习完之后,我们可以对任意sql进行解析,同时也可以基于AST语法树来生成sql语句。
+:::
+
+[![](https://img.shields.io/badge/SQL%E8%A7%A3%E6%9E%90-sql--parse--example-green)](https://github.com/lxchinesszz/sql-parse-example)
 
 ## 一、AST
 
@@ -258,6 +265,69 @@ select u.id, u.name from users as u where id = 1 and name = ?;
         }
         SQLExpr where = sqlUpdateStatement.getWhere();
         Utils.startParse("解析where", Utils::parseWhere, where);
+    }
+```
+
+### 2.2.4 解析 SQLLimit
+
+```java 
+    /**
+     * 偏移量,只有2个值
+     *
+     * @param limit 限制
+     */
+    private void parseLimit(SQLLimit limit) {
+        // 偏移量
+        SQLExpr offset = limit.getOffset();
+        // 便宜数量
+        SQLExpr rowCount = limit.getRowCount();
+        print("偏移量:{},偏移数量:{}", offset, rowCount);
+    }
+```
+
+
+### 2.2.5 解析 SQLSelectGroupBy
+
+```java 
+    @Test
+    public void groupBy() {
+        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement("select name,count(1) as count from users group by name,age having count > 2");
+        SQLSelectStatement selectStatement = Utils.cast(sqlStatement, SQLSelectStatement.class);
+        SQLSelect select = selectStatement.getSelect();
+        SQLSelectQueryBlock query = Utils.cast(select.getQuery(), SQLSelectQueryBlock.class);
+        SQLSelectGroupByClause groupBy = query.getGroupBy();
+        List<SQLExpr> items = groupBy.getItems();
+        for (SQLExpr item : items) {
+            // group by name
+            // group by age
+            SQLIdentifierExpr groupByColumn = Utils.cast(item, SQLIdentifierExpr.class);
+            Utils.print("group by {}", groupByColumn);
+        }
+    }
+
+```
+### 2.2.6 解析 Having
+
+```java 
+    @Test
+    public void having() {
+        SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement("select name,count(1) as count from users group by name,age having count > 2");
+        SQLSelectStatement selectStatement = Utils.cast(sqlStatement, SQLSelectStatement.class);
+        SQLSelect select = selectStatement.getSelect();
+        SQLSelectQueryBlock query = Utils.cast(select.getQuery(), SQLSelectQueryBlock.class);
+        SQLSelectGroupByClause groupBy = query.getGroupBy();
+        SQLExpr having = groupBy.getHaving();
+        // 因为只有一个条件,所以having就是SQLBinaryOpExpr
+        SQLBinaryOpExpr havingExpr = Utils.cast(having, SQLBinaryOpExpr.class);
+        // 没有使用别名,所以就是SQLIdentifierExpr
+        SQLExpr left = havingExpr.getLeft();
+        SQLIdentifierExpr leftExpr = Utils.cast(left, SQLIdentifierExpr.class);
+        // 数字类型就是
+        SQLExpr right = havingExpr.getRight();
+        SQLValuableExpr rightValue = Utils.cast(right, SQLValuableExpr.class);
+        SQLBinaryOperator operator = havingExpr.getOperator();
+        // left:count, operator:>,right:2
+        Utils.print("left:{}, operator:{},right:{}", leftExpr.getName(), operator.name, rightValue.getValue());
     }
 ```
 

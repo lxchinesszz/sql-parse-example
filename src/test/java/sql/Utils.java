@@ -82,6 +82,5 @@ public class Utils {
                 parseSQLBinaryOpExpr(conditionBinary);
             }
         }
-
     }
 }

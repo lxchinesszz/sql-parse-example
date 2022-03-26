@@ -25,8 +25,10 @@ public class StatementTest {
         System.out.println(SQLUtils.parseSingleMysqlStatement("delete from users where id = 1") instanceof SQLDeleteStatement);
     }
 
+
+
     @Test
-    public void SQLDeleteStatement(){
+    public void SQLDeleteStatement() {
         SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement("delete from users where id = 1");
         SQLDeleteStatement sqlDeleteStatement = Utils.cast(sqlStatement, SQLDeleteStatement.class);
         sqlDeleteStatement.addCondition(SQLUtils.toSQLExpr("name = '孙悟空'"));
@@ -38,7 +40,7 @@ public class StatementTest {
 
 
     @Test
-    public void SQLDeleteStatement2(){
+    public void SQLDeleteStatement2() {
         SQLStatement sqlStatement = SQLUtils.parseSingleMysqlStatement("delete from users where id = 1");
         SQLDeleteStatement sqlDeleteStatement = Utils.cast(sqlStatement, SQLDeleteStatement.class);
         SQLExpr where = sqlDeleteStatement.getWhere();
